@@ -1,0 +1,13 @@
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: example-nfs
+provisioner: example.com/external-nfs
+parameters:
+  server: nfs-server.example.com
+  # server: Server is the hostname or IP address of the NFS server.
+  path: /share
+  # path: Path that is exported by the NFS server.
+  readOnly: false
+  # readOnly: A flag indicating whether the storage will be mounted as read only (default false).

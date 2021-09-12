@@ -1,0 +1,40 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc0001
+spec:
+  accessModes:
+    - ReadWriteOnce
+  # Access Modes, The access modes are:
+  # ReadWriteOnce -- the volume can be mounted as read-write by a single node
+  # ReadOnlyMany -- the volume can be mounted read-only by many nodes
+  # ReadWriteMany -- the volume can be mounted as read-write by many nodes
+  # ReadWriteOncePod -- the volume can be mounted as read-write by a single Pod. This is only supported for CSI volumes and Kubernetes version 1.22+.
+  volumeMode: Filesystem
+  # Volume Mode: Filesystem and Block
+  # volumeMode is an optional API parameter. Filesystem is the default mode used when volumeMode parameter is omitted.
+  resources:
+    requests:
+      storage: 8Gi
+  storageClassName: slow
+  selector:
+    matchLabels:
+      release: "stable"
+      # matchLabels - the volume must have a label with this value
+    matchExpressions:
+      - {key: environment, operator: In, values: [dev]}
+    # matchExpressions - a list of requirements made by specifying key, list of values, and operator that relates the key and values. Valid operators include In, NotIn, Exists, and DoesNotExist.
+    
+    # Reclaiming:
+    # volumes can either be Retained, Recycled, or Deleted.
+    # Retain: The Retain reclaim policy allows for manual reclamation of the resource. When the PersistentVolumeClaim is deleted, the PersistentVolume still exists and the volume is considered "released".
+    # Delete: For volume plugins that support the Delete reclaim policy, deletion removes both the PersistentVolume object from Kubernetes, as well as the associated storage asset in the external infrastructure
+    # The Recycle reclaim policy is deprecated. Instead, the recommended approach is to use dynamic provisioning.
+
+    # Phase:
+    # A volume will be in one of the following phases:
+    # Available -- a free resource that is not yet bound to a claim
+    # Bound -- the volume is bound to a claim
+    # Released -- the claim has been deleted, but the resource is not yet reclaimed by the cluster
+    # Failed -- the volume has failed its automatic reclamation
