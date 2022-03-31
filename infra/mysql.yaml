@@ -1,0 +1,57 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: mysql
+  name: mysql
+spec:
+  ports:
+  - name: 3306-3306
+    port: 3306
+    protocol: TCP
+    targetPort: 3306
+  selector:
+    app: mysql
+  type: LoadBalancer
+status:
+  loadBalancer: {}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+spec:
+  selector:
+    matchLabels:
+      app: mysql # has to match .spec.template.metadata.labels
+  serviceName: "mysql"
+  replicas: 1 # by default is 1
+  minReadySeconds: 10 # by default is 0
+  template:
+    metadata:
+      labels:
+        app: mysql # has to match .spec.selector.matchLabels
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: mysql
+        image: mysql:8.0.28-debian
+        env: 
+          - name: MYSQL_ALLOW_EMPTY_PASSWORD
+            value: "yes"
+        ports:
+        - containerPort: 3306
+        volumeMounts:
+        - name: mysql
+          mountPath: /var/lib/mysql
+  volumeClaimTemplates:
+  - metadata:
+      name: mysql
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: local-path
+      resources:
+        requests:
+          storage: 1Gi
